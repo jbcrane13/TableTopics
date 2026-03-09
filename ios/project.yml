@@ -1,0 +1,60 @@
+name: TableTopics
+options:
+  bundleIdPrefix: com.tabletopics
+  deploymentTarget:
+    iOS: "18.0"
+  xcodeVersion: "16"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+packages:
+  B2BPlatform:
+    path: ../../B2BPlatform
+
+targets:
+  TableTopics:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: TableTopics/TableTopics
+        includes:
+          - "**/*.swift"
+      - path: TableTopics/TableTopics/Assets.xcassets
+    info:
+      path: TableTopics/TableTopics/Info.plist
+      properties:
+        CFBundleName: Table Topics
+        CFBundleDisplayName: Table Topics
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        CFBundleIconName: AppIcon
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiresFullScreen: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tabletopics.app
+        DEVELOPMENT_TEAM: 32XZRDTGK3
+        SWIFT_VERSION: 6.0
+        SWIFT_STRICT_CONCURRENCY: complete
+        CODE_SIGN_STYLE: Automatic
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Table Topics
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.business
+    dependencies:
+      - package: B2BPlatform
+        product: B2BCore
+      - package: B2BPlatform
+        product: B2BUI
