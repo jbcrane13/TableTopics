@@ -104,8 +104,7 @@ final class LeadsViewModel {
             )
         } catch {
             self.error = error.localizedDescription
-            // Fallback to mock data on error
-            leads = MockData.sampleLeads
+            leads = []
         }
         
         isLoading = false

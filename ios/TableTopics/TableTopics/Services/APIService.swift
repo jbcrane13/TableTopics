@@ -59,7 +59,7 @@ public final class APIService: Sendable {
     
     /// Search for contractors by work type and location
     /// - Parameters:
-    ///   - query: Work type (e.g., "restaurant furniture", "hotel renovation")
+    ///   - query: Shovels permit tag (e.g., "hvac", "solar", "new_construction")
     ///   - stateCode: Two-letter state code (e.g., "AL", "TX")
     ///   - city: Optional city name
     ///   - limit: Max results (default 20)
@@ -83,24 +83,29 @@ public final class APIService: Sendable {
             limit: limit
         )
         
-        // Convert contractors to leads
+        if contractors.isEmpty {
+            throw APIError.noResults
+        }
+        
+        // Build leads from contractor data directly (no N+1 permit queries)
+        // Contractor data already includes permit_count, avg_job_value, rating, tag_tally
         var leads: [Lead] = []
         for contractor in contractors {
-            // Get permits for this contractor to build the project
-            let permits = try await shovels.getPermitsByContractor(
-                contractorId: contractor.id,
-                limit: 5
-            )
+            let company = contractor.toCompany()
             
-            // Create lead from contractor + most recent permit
-            let project = permits.first?.toProject() ?? Project(
-                description: "No active permits",
+            // Build a project summary from the contractor's permit data
+            let tags = contractor.tagTally?.keys.sorted().joined(separator: ", ") ?? query
+            let permitDescription = "\(tags.capitalized) contractor — \(contractor.permitCount ?? 0) permits"
+            
+            let project = Project(
+                description: permitDescription,
                 address: contractor.address?.toAddress() ?? Address(),
-                status: .filed
+                estimatedValue: contractor.avgJobValue.map { Double($0) / 100.0 },
+                status: .inProgress
             )
             
             var lead = Lead(
-                company: contractor.toCompany(),
+                company: company,
                 project: project,
                 source: .permitScout
             )
@@ -146,10 +151,8 @@ public final class APIService: Sendable {
     
     /// Estimate credits for a search
     public func estimatedCredits(for limit: Int) -> Int {
-        // Each contractor result = 1 credit
-        // + 5 permits per contractor = 5 credits
-        // Total: 6 credits per result
-        return limit * 6
+        // One contractor search uses 1 credit per result returned
+        return limit
     }
 }
 
