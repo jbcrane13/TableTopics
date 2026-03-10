@@ -1,5 +1,5 @@
 // APIService.swift
-// Table Topics API Service - wraps Shovels.ai API for contractor leads
+// Table Topics API Service - wraps Shovels.ai API for commercial project leads
 
 import B2BCore
 import Foundation
@@ -19,7 +19,8 @@ private final class APIState: @unchecked Sendable {
 private let defaultAPIKey = "k08-LvykVPjfJROkN7FXUYKEmOfsqCp8SSWvMb8VbC0"
 
 /// API Service for Table Topics
-/// Manages API keys and wraps Shovels.ai for contractor lead data
+/// Searches commercial construction permits to find restaurant/hotel projects
+/// that will need tables and furniture
 public final class APIService: Sendable {
     
     // MARK: - Singleton
@@ -35,7 +36,6 @@ public final class APIService: Sendable {
     
     private init() {
         let savedKey = UserDefaults.standard.string(forKey: userDefaultsKey)
-        // Use saved key, or fall back to default key
         self.state = APIState(apiKey: savedKey ?? defaultAPIKey)
     }
     
@@ -55,15 +55,17 @@ public final class APIService: Sendable {
     
     public var apiKey: String? { state.apiKey }
     
-    // MARK: - Shovels API Methods
+    // MARK: - Search Methods
     
-    /// Search for contractors by work type and location
+    /// Search for commercial projects (restaurants, hotels, etc.)
+    /// Uses permit-based search with free-text matching on descriptions
     /// - Parameters:
-    ///   - query: Shovels permit tag (e.g., "hvac", "solar", "new_construction")
+    ///   - query: Search query — either a free-text term (e.g., "restaurant")
+    ///            or a tag prefixed with "__tag:" (e.g., "__tag:new_construction")
     ///   - stateCode: Two-letter state code (e.g., "AL", "TX")
-    ///   - city: Optional city name
+    ///   - city: Optional city name (informational — not used by Shovels directly)
     ///   - limit: Max results (default 20)
-    /// - Returns: Array of Lead objects
+    /// - Returns: Array of Lead objects built from permit data
     public func searchLeads(
         query: String,
         stateCode: String,
@@ -76,32 +78,51 @@ public final class APIService: Sendable {
         
         let shovels = ShovelsAPIService(apiKey: key)
         
-        let contractors = try await shovels.searchContractors(
-            query: query,
-            state: stateCode,
-            city: city,
-            limit: limit
-        )
+        // Determine search mode: tag-based or free-text
+        let isTagSearch = query.hasPrefix("__tag:")
+        let permits: [ShovelsPermit]
         
-        if contractors.isEmpty {
+        if isTagSearch {
+            let tag = String(query.dropFirst("__tag:".count))
+            permits = try await shovels.searchPermits(
+                tags: tag,
+                state: stateCode,
+                propertyType: "commercial",
+                hasContractor: true,
+                limit: limit
+            )
+        } else {
+            permits = try await shovels.searchPermits(
+                textQuery: query,
+                state: stateCode,
+                propertyType: "commercial",
+                hasContractor: nil,  // Don't restrict — many permits lack contractor links
+                limit: limit
+            )
+        }
+        
+        if permits.isEmpty {
             throw APIError.noResults
         }
         
-        // Build leads from contractor data directly (no N+1 permit queries)
-        // Contractor data already includes permit_count, avg_job_value, rating, tag_tally
+        // Build leads from permit data
         var leads: [Lead] = []
-        for contractor in contractors {
-            let company = contractor.toCompany()
+        for permit in permits {
+            let project = permit.toProject()
             
-            // Build a project summary from the contractor's permit data
-            let tags = contractor.tagTally?.keys.sorted().joined(separator: ", ") ?? query
-            let permitDescription = "\(tags.capitalized) contractor — \(contractor.permitCount ?? 0) permits"
+            // Use property owner as the company (they're the buyer),
+            // fall back to permit jurisdiction/description
+            let companyName = permit.propertyLegalOwner
+                ?? permit.jurisdiction
+                ?? "Commercial Project"
             
-            let project = Project(
-                description: permitDescription,
-                address: contractor.address?.toAddress() ?? Address(),
-                estimatedValue: contractor.avgJobValue.map { Double($0) / 100.0 },
-                status: .inProgress
+            let company = Company(
+                id: UUID(),
+                name: companyName,
+                address: permit.address?.toAddress() ?? Address(),
+                phone: nil,
+                email: nil,
+                website: nil
             )
             
             var lead = Lead(
@@ -110,9 +131,7 @@ public final class APIService: Sendable {
                 source: .permitScout
             )
             
-            // Calculate lead score
             lead.updateScore(LeadScore.calculate(for: lead))
-            
             leads.append(lead)
         }
         
@@ -151,7 +170,7 @@ public final class APIService: Sendable {
     
     /// Estimate credits for a search
     public func estimatedCredits(for limit: Int) -> Int {
-        // One contractor search uses 1 credit per result returned
+        // One permit search uses 1 credit per result returned
         return limit
     }
 }

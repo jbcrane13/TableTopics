@@ -1,5 +1,5 @@
 // ContractorSearchView.swift
-// Search for hotel/restaurant contractors — focused on table sales leads
+// Search for hotel/restaurant construction projects — focused on table sales leads
 
 import SwiftUI
 import B2BCore
@@ -13,20 +13,21 @@ struct ContractorSearchView: View {
     @State private var showingSettings = false
     @State private var showingAreaLock = false
     
-    // Search queries for hotel/restaurant contractors
-    // These are the types of contractors who buy tables
-    private let searchQueries = [
-        "restaurant furniture",
-        "hotel furniture",
-        "commercial tables",
-        "restaurant renovation",
-        "hotel renovation",
-        "bar furniture",
-        "cafe furniture",
-        "banquet furniture"
+    /// Search categories mapped to Shovels permit_q free-text search
+    /// These search permit descriptions for commercial property types
+    private let searchCategories: [(label: String, query: String)] = [
+        ("Restaurant — New Build", "restaurant"),
+        ("Restaurant — Renovation", "restaurant remodel"),
+        ("Hotel / Hospitality", "hotel"),
+        ("Bar / Lounge", "bar lounge"),
+        ("Cafe / Coffee Shop", "cafe coffee"),
+        ("Banquet / Event Space", "banquet event center"),
+        ("Commercial Kitchen", "commercial kitchen"),
+        ("All Commercial New Construction", "__tag:new_construction"),
+        ("All Commercial Remodels", "__tag:remodel"),
     ]
     
-    @State private var selectedQuery: String = "restaurant furniture"
+    @State private var selectedCategory: Int = 0
     
     let states = [
         "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
@@ -68,14 +69,14 @@ struct ContractorSearchView: View {
                 } header: {
                     Text("Shovels API")
                 } footer: {
-                    Text("Free tier: 250 credits. Each search uses ~6 credits per result.")
+                    Text("Searches commercial construction permits. ~1 credit per result.")
                 }
                 
-                // Contractor Type
-                Section("Contractor Type") {
-                    Picker("Looking For", selection: $selectedQuery) {
-                        ForEach(searchQueries, id: \.self) { query in
-                            Text(query.capitalized).tag(query)
+                // Search Category
+                Section("What Are You Looking For?") {
+                    Picker("Category", selection: $selectedCategory) {
+                        ForEach(0..<searchCategories.count, id: \.self) { index in
+                            Text(searchCategories[index].label).tag(index)
                         }
                     }
 #if os(iOS)
@@ -117,7 +118,7 @@ struct ContractorSearchView: View {
                 Section {
                     Button(action: performSearch) {
                         HStack {
-                            Text("Find Contractors")
+                            Text("Find Projects")
                             Spacer()
                             if isSearching {
                                 ProgressView()
@@ -138,8 +139,8 @@ struct ContractorSearchView: View {
                 
                 // Results Preview
                 if !viewModel.leads.isEmpty {
-                    Section("Results (\(viewModel.leads.count) contractors)") {
-                        ForEach(viewModel.leads.prefix(5)) { lead in
+                    Section("Results (\(viewModel.leads.count) projects)") {
+                        ForEach(viewModel.leads.prefix(10)) { lead in
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
                                     Text(lead.company.name)
@@ -157,9 +158,17 @@ struct ContractorSearchView: View {
                                     .lineLimit(2)
                                     .foregroundColor(.secondary)
                                 
-                                Text("\(lead.project.address.city), \(lead.project.address.state)")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
+                                if !lead.project.address.city.isEmpty {
+                                    Text("\(lead.project.address.city), \(lead.project.address.state)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                if let value = lead.project.estimatedValue, value > 0 {
+                                    Text("Est. Value: $\(Int(value).formatted())")
+                                        .font(.caption2)
+                                        .foregroundColor(.brandBlue)
+                                }
                             }
                         }
                     }
@@ -177,7 +186,7 @@ struct ContractorSearchView: View {
                     Text("Data Source")
                 }
             }
-            .navigationTitle("Find Contractors")
+            .navigationTitle("Find Projects")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
@@ -205,18 +214,20 @@ struct ContractorSearchView: View {
     }
     
     private func performSearch() {
+        let category = searchCategories[selectedCategory]
+        
         Task {
             isSearching = true
             searchError = nil
             
-            do {
-                await viewModel.search(
-                    query: selectedQuery,
-                    stateCode: selectedState,
-                    city: searchCity.isEmpty ? nil : searchCity
-                )
-            } catch {
-                searchError = error.localizedDescription
+            await viewModel.search(
+                query: category.query,
+                stateCode: selectedState,
+                city: searchCity.isEmpty ? nil : searchCity
+            )
+            
+            if let error = viewModel.error {
+                searchError = error
             }
             
             isSearching = false
@@ -308,7 +319,6 @@ struct AreaLockSheet: View {
                 
                 Section {
                     Button("Lock Area") {
-                        let area = lockCity.isEmpty ? lockState : "\(lockCity), \(lockState)"
                         viewModel.lockArea(state: lockState, city: lockCity.isEmpty ? nil : lockCity)
                         isPresented = false
                     }
