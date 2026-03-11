@@ -1,5 +1,5 @@
 // LeadDetailView.swift
-// Detailed lead view — dark OLED theme
+// Detailed lead view — dark OLED theme with floating contact bar
 
 import SwiftUI
 #if canImport(UIKit)
@@ -14,12 +14,13 @@ struct LeadDetailView: View {
     private var tierColor: Color { lead.score?.tier.color ?? .brandBlue }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             Color.brandBackground.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 14) {
                     heroCard
+                    quickActionsBar
                     quickStatsRow
                     companyContactCard
                     projectCard
@@ -30,32 +31,20 @@ struct LeadDetailView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
-                .padding(.bottom, 32)
+                .padding(.bottom, 100) // Space for floating bar
             }
         }
         .navigationTitle(lead.company.name)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                if let phone = lead.company.phone {
-                    Button {
-                        callPhone(phone)
-                    } label: {
-                        Image(systemName: "phone.fill")
-                            .foregroundColor(.brandGreen)
-                    }
-                }
-            }
-        }
+        .accessibilityIdentifier("screen_lead_detail")
     }
 
     // MARK: - Hero Card
 
     private var heroCard: some View {
         ZStack(alignment: .bottomLeading) {
-            // Gradient: tier accent → deep black
             LinearGradient(
                 colors: [tierColor.opacity(0.45), Color.brandBackground],
                 startPoint: .topTrailing,
@@ -63,7 +52,6 @@ struct LeadDetailView: View {
             )
             .cornerRadius(18)
 
-            // Subtle top border in tier color
             VStack {
                 Rectangle()
                     .fill(tierColor.opacity(0.6))
@@ -75,7 +63,6 @@ struct LeadDetailView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top) {
-                    // Tier badge
                     if let score = lead.score {
                         HStack(spacing: 5) {
                             Image(systemName: score.tier.icon)
@@ -95,11 +82,11 @@ struct LeadDetailView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(score.tier.color.opacity(0.3), lineWidth: 0.5)
                         )
+                        .accessibilityIdentifier("detail_badge_tier")
                     }
 
                     Spacer()
 
-                    // Large score
                     if let score = lead.score {
                         VStack(alignment: .trailing, spacing: 0) {
                             Text("\(Int(score.overall * 100))")
@@ -109,6 +96,7 @@ struct LeadDetailView: View {
                                 .font(.caption)
                                 .foregroundColor(Color.secondary)
                         }
+                        .accessibilityIdentifier("detail_label_score")
                     }
                 }
 
@@ -117,10 +105,12 @@ struct LeadDetailView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.primary)
+                        .accessibilityIdentifier("detail_label_company_name")
                     Label(lead.company.address.city + ", " + lead.company.address.state,
                           systemImage: "location.fill")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                        .accessibilityIdentifier("detail_label_location")
                 }
             }
             .padding(18)
@@ -130,6 +120,73 @@ struct LeadDetailView: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(tierColor.opacity(0.25), lineWidth: 0.5)
         )
+        .accessibilityIdentifier("detail_card_hero")
+    }
+
+    // MARK: - Quick Actions Bar
+
+    private var quickActionsBar: some View {
+        HStack(spacing: 12) {
+            if let phone = bestPhone {
+                actionButton(
+                    icon: "phone.fill",
+                    label: "Call",
+                    color: .brandGreen,
+                    identifier: "detail_button_call"
+                ) {
+                    callPhone(phone)
+                }
+            }
+
+            if let email = bestEmail {
+                actionButton(
+                    icon: "envelope.fill",
+                    label: "Email",
+                    color: .brandBlue,
+                    identifier: "detail_button_email"
+                ) {
+                    sendEmail(email)
+                }
+            }
+
+            if let phone = bestPhone {
+                actionButton(
+                    icon: "message.fill",
+                    label: "Text",
+                    color: .brandAmber,
+                    identifier: "detail_button_text"
+                ) {
+                    sendText(phone)
+                }
+            }
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 16)
+        .darkCard()
+        .accessibilityIdentifier("detail_bar_quick_actions")
+    }
+
+    private func actionButton(icon: String, label: String, color: Color, identifier: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.subheadline)
+                Text(label)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(color.opacity(0.15))
+            .foregroundColor(color)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(color.opacity(0.3), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
     }
 
     // MARK: - Quick Stats Row
@@ -158,6 +215,7 @@ struct LeadDetailView: View {
         }
         .padding(.vertical, 14)
         .darkCard()
+        .accessibilityIdentifier("detail_card_stats")
     }
 
     private func quickStat(value: String, label: String, valueColor: Color = Color.primary) -> some View {
@@ -188,12 +246,22 @@ struct LeadDetailView: View {
 
             VStack(spacing: 8) {
                 if let phone = lead.company.phone {
-                    contactRow(icon: "phone.fill", text: phone, color: .brandGreen) {
+                    contactRow(
+                        icon: "phone.fill",
+                        text: phone,
+                        color: .brandGreen,
+                        identifier: "detail_button_company_phone"
+                    ) {
                         callPhone(phone)
                     }
                 }
                 if let email = lead.company.email {
-                    contactRow(icon: "envelope.fill", text: email, color: .brandBlue) {
+                    contactRow(
+                        icon: "envelope.fill",
+                        text: email,
+                        color: .brandBlue,
+                        identifier: "detail_button_company_email"
+                    ) {
                         sendEmail(email)
                     }
                 }
@@ -209,9 +277,10 @@ struct LeadDetailView: View {
         }
         .padding(16)
         .darkCard()
+        .accessibilityIdentifier("detail_card_company")
     }
 
-    private func contactRow(icon: String, text: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func contactRow(icon: String, text: String, color: Color, identifier: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 10) {
                 Image(systemName: icon)
@@ -235,6 +304,7 @@ struct LeadDetailView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
     }
 
     private func infoRow(icon: String, text: String, color: Color) -> some View {
@@ -278,15 +348,18 @@ struct LeadDetailView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.brandBlue.opacity(0.3), lineWidth: 0.5)
                         )
+                        .accessibilityIdentifier("detail_badge_permit_type")
 
                     Spacer()
 
                     StatusBadge(status: lead.status)
+                        .accessibilityIdentifier("detail_badge_status")
                 }
 
                 Text(lead.project.description)
                     .font(.body)
                     .foregroundColor(Color.primary)
+                    .accessibilityIdentifier("detail_label_project_description")
 
                 Rectangle()
                     .fill(Color.brandBorder.opacity(0.4))
@@ -303,6 +376,7 @@ struct LeadDetailView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.brandGreen)
                     }
+                    .accessibilityIdentifier("detail_row_estimated_value")
                 }
 
                 HStack(spacing: 6) {
@@ -313,6 +387,7 @@ struct LeadDetailView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+                .accessibilityIdentifier("detail_label_project_address")
 
                 if let permit = lead.project.permitNumber {
                     HStack(spacing: 6) {
@@ -323,11 +398,13 @@ struct LeadDetailView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    .accessibilityIdentifier("detail_label_permit_number")
                 }
             }
         }
         .padding(16)
         .darkCard()
+        .accessibilityIdentifier("detail_card_project")
     }
 
     // MARK: - Contacts Section
@@ -348,12 +425,14 @@ struct LeadDetailView: View {
                 .padding(14)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .darkCard()
+                .accessibilityIdentifier("detail_label_no_contacts")
             } else {
                 ForEach(lead.decisionMakers) { dm in
                     DecisionMakerCard(decisionMaker: dm)
                 }
             }
         }
+        .accessibilityIdentifier("detail_section_contacts")
     }
 
     // MARK: - Notes Card
@@ -369,6 +448,7 @@ struct LeadDetailView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .darkCard()
+        .accessibilityIdentifier("detail_card_notes")
     }
 
     // MARK: - Section Header
@@ -385,20 +465,39 @@ struct LeadDetailView: View {
         }
     }
 
+    // MARK: - Contact Helpers
+
+    private var bestPhone: String? {
+        lead.company.phone ?? lead.decisionMakers.first(where: { $0.phone != nil })?.phone
+    }
+
+    private var bestEmail: String? {
+        lead.company.email ?? lead.decisionMakers.first(where: { $0.email != nil })?.email
+    }
+
     // MARK: - Actions
 
     private func callPhone(_ phone: String) {
         let cleaned = phone.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+        #if canImport(UIKit)
         if let url = URL(string: "tel://\(cleaned)") {
-            #if canImport(UIKit)
             UIApplication.shared.open(url)
-            #endif
         }
+        #endif
     }
 
     private func sendEmail(_ email: String) {
         #if canImport(UIKit)
         if let url = URL(string: "mailto:\(email)") {
+            UIApplication.shared.open(url)
+        }
+        #endif
+    }
+
+    private func sendText(_ phone: String) {
+        let cleaned = phone.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+        #if canImport(UIKit)
+        if let url = URL(string: "sms:\(cleaned)") {
             UIApplication.shared.open(url)
         }
         #endif
@@ -435,6 +534,7 @@ struct DecisionMakerCard: View {
                     .fontWeight(.bold)
                     .foregroundColor(decisionMaker.quality.color)
             }
+            .accessibilityIdentifier("dm_avatar_\(decisionMaker.id)")
 
             // Info
             VStack(alignment: .leading, spacing: 5) {
@@ -455,12 +555,14 @@ struct DecisionMakerCard: View {
                     .padding(.vertical, 3)
                     .background(decisionMaker.quality.color.opacity(0.12))
                     .cornerRadius(6)
+                    .accessibilityIdentifier("dm_badge_quality_\(decisionMaker.id)")
                 }
 
                 if let title = decisionMaker.title {
                     Text(title)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .accessibilityIdentifier("dm_label_title_\(decisionMaker.id)")
                 }
 
                 if let email = decisionMaker.email {
@@ -473,35 +575,56 @@ struct DecisionMakerCard: View {
                             .lineLimit(1)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("dm_button_email_\(decisionMaker.id)")
                 } else if let phone = decisionMaker.phone {
                     Label(phone, systemImage: "phone")
                         .font(.caption)
                         .foregroundColor(.brandBlue)
+                        .accessibilityIdentifier("dm_label_phone_\(decisionMaker.id)")
                 }
 
                 Text("\(Int(decisionMaker.confidence * 100))% confidence")
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .accessibilityIdentifier("dm_label_confidence_\(decisionMaker.id)")
             }
 
             Spacer(minLength: 4)
 
-            // Call button
-            if let phone = decisionMaker.phone {
-                Button {
-                    callPhone(phone)
-                } label: {
-                    Image(systemName: "phone.fill")
-                        .font(.subheadline)
-                        .frame(width: 42, height: 42)
-                        .background(Color.brandGreen)
-                        .foregroundColor(.black)
-                        .cornerRadius(12)
+            // Action buttons
+            VStack(spacing: 6) {
+                if let phone = decisionMaker.phone {
+                    Button {
+                        callPhone(phone)
+                    } label: {
+                        Image(systemName: "phone.fill")
+                            .font(.caption)
+                            .frame(width: 36, height: 36)
+                            .background(Color.brandGreen)
+                            .foregroundColor(.black)
+                            .cornerRadius(10)
+                    }
+                    .accessibilityIdentifier("dm_button_call_\(decisionMaker.id)")
+                }
+
+                if let phone = decisionMaker.phone {
+                    Button {
+                        sendText(phone)
+                    } label: {
+                        Image(systemName: "message.fill")
+                            .font(.caption)
+                            .frame(width: 36, height: 36)
+                            .background(Color.brandAmber.opacity(0.2))
+                            .foregroundColor(.brandAmber)
+                            .cornerRadius(10)
+                    }
+                    .accessibilityIdentifier("dm_button_text_\(decisionMaker.id)")
                 }
             }
         }
         .padding(14)
         .darkCard()
+        .accessibilityIdentifier("dm_card_\(decisionMaker.id)")
     }
 
     private func callPhone(_ phone: String) {
@@ -516,6 +639,15 @@ struct DecisionMakerCard: View {
     private func sendEmail(_ email: String) {
         #if canImport(UIKit)
         if let url = URL(string: "mailto:\(email)") {
+            UIApplication.shared.open(url)
+        }
+        #endif
+    }
+
+    private func sendText(_ phone: String) {
+        let cleaned = phone.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+        #if canImport(UIKit)
+        if let url = URL(string: "sms:\(cleaned)") {
             UIApplication.shared.open(url)
         }
         #endif

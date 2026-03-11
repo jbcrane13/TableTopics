@@ -58,3 +58,43 @@ targets:
         product: B2BCore
       - package: B2BPlatform
         product: B2BUI
+
+  TableTopicsTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: TableTopics/TableTopicsTests
+        includes:
+          - "**/*.swift"
+      - path: TableTopics/TableTopicsTests/TestFixtures
+        includes:
+          - "**/*.json"
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tabletopics.tests
+        SWIFT_VERSION: 6.0
+        SWIFT_STRICT_CONCURRENCY: complete
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: TableTopics
+      - package: B2BPlatform
+        product: B2BCore
+
+  TableTopicsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: TableTopics/TableTopicsUITests
+        includes:
+          - "**/*.swift"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tabletopics.uitests
+        SWIFT_VERSION: 6.0
+        SWIFT_STRICT_CONCURRENCY: complete
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: TableTopics

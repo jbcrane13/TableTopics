@@ -18,8 +18,9 @@ extension Color {
     // Accents
     static let brandBlue          = Color(red: 0.220, green: 0.741, blue: 0.976)  // #38BDF8 sky blue
     static let brandGreen         = Color(red: 0.133, green: 0.773, blue: 0.369)  // #22C55E CTA green
+    static let brandAmber         = Color(red: 0.961, green: 0.620, blue: 0.043)  // #F59E0B warm accent
 
-    // Legacy aliases (used internally)
+    // Legacy aliases
     static let brandNavy          = Color(red: 0.059, green: 0.090, blue: 0.165)  // #0F172A
     static let brandSlate         = Color(red: 0.282, green: 0.337, blue: 0.416)  // #475569
 }
@@ -109,6 +110,7 @@ struct ScoreBadge: View {
             RoundedRectangle(cornerRadius: 10)
                 .stroke(score.tier.color.opacity(0.3), lineWidth: 0.5)
         )
+        .accessibilityIdentifier("score_badge_\(Int(score.overall * 100))")
     }
 }
 
@@ -149,5 +151,86 @@ struct TierChip: View {
             .animation(.easeInOut(duration: 0.15), value: isSelected)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("tier_chip_\(title.lowercased())")
+    }
+}
+
+// MARK: - CategoryPill
+
+struct CategoryPill: View {
+    let label: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(label)
+                .font(.caption)
+                .fontWeight(isSelected ? .bold : .medium)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(isSelected ? Color.brandBlue : Color.brandCardElevated)
+                .foregroundColor(isSelected ? .black : Color.primary)
+                .cornerRadius(16)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(isSelected ? Color.clear : Color.brandBorder.opacity(0.5), lineWidth: 0.5)
+                )
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("category_pill_\(label.lowercased().replacingOccurrences(of: " ", with: "_"))")
+    }
+}
+
+// MARK: - Quick Action Button
+
+struct QuickActionButton: View {
+    let icon: String
+    let label: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .frame(width: 44, height: 44)
+                    .background(color.opacity(0.15))
+                    .foregroundColor(color)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(color.opacity(0.3), lineWidth: 0.5)
+                    )
+                Text(label)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(color.opacity(0.8))
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("quick_action_\(label.lowercased())")
+    }
+}
+
+// MARK: - Search Field Style
+
+struct SearchFieldStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background(Color.brandCardElevated)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.brandBorder.opacity(0.4), lineWidth: 0.5)
+            )
+    }
+}
+
+extension View {
+    func searchFieldStyle() -> some View {
+        modifier(SearchFieldStyle())
     }
 }

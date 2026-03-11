@@ -1,0 +1,52 @@
+{
+  "permits": [
+    {
+      "id": "test-permit-001",
+      "description": "New restaurant construction - 2 story commercial building",
+      "property_legal_owner": "Sunshine Dining LLC",
+      "jurisdiction": "Austin",
+      "permit_number": "BP-2025-99001",
+      "permit_type": "new_construction",
+      "property_type": "commercial",
+      "status": "approved",
+      "estimated_value": 750000,
+      "address": {
+        "street": "100 Main St",
+        "city": "Austin",
+        "state": "TX",
+        "zip": "78701"
+      },
+      "contractor": {
+        "id": "contractor-001",
+        "name": "Premier Builders Inc"
+      },
+      "tags": ["new_construction", "commercial"],
+      "filed_date": "2025-01-15",
+      "approved_date": "2025-02-20"
+    },
+    {
+      "id": "test-permit-002",
+      "description": "Hotel lobby renovation and restaurant remodel",
+      "property_legal_owner": "Grand Hotel Group",
+      "jurisdiction": "Houston",
+      "permit_number": "BP-2025-99002",
+      "permit_type": "renovation",
+      "property_type": "commercial",
+      "status": "in_progress",
+      "estimated_value": 1250000,
+      "address": {
+        "street": "500 Commerce Blvd",
+        "city": "Houston",
+        "state": "TX",
+        "zip": "77001"
+      },
+      "contractor": null,
+      "tags": ["renovation", "commercial"],
+      "filed_date": "2024-11-01",
+      "approved_date": "2025-01-10"
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "per_page": 20
+}

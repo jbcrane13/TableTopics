@@ -22,7 +22,10 @@ final class LeadsViewModel {
     
     /// Search query (contractor type: "restaurant furniture", "hotel renovation", etc.)
     var searchQuery: String = "restaurant furniture"
-    
+
+    /// Currently selected search category index
+    var selectedCategory: Int = 0
+
     /// Result limit (be conservative with free tier - 250 credits)
     var resultLimit: Int = 10
     
@@ -59,8 +62,18 @@ final class LeadsViewModel {
         return lockedState
     }
     
+    // MARK: - US States
+
+    static let usStates = [
+        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+        "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+        "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+        "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+        "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+    ]
+
     // MARK: - Computed Properties
-    
+
     var hotLeads: [Lead] { leads.filter { $0.score?.tier == .hot } }
     var warmLeads: [Lead] { leads.filter { $0.score?.tier == .warm } }
     var coolLeads: [Lead] { leads.filter { $0.score?.tier == .cool } }
