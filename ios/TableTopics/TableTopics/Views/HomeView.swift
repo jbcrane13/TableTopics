@@ -11,17 +11,8 @@ struct HomeView: View {
     @State private var showingSettings = false
     @State private var isSearchBarExpanded = true
 
-    /// Search categories mapped to Shovels permit queries
-    private let searchCategories: [(label: String, query: String)] = [
-        ("Restaurant", "restaurant"),
-        ("Hotel", "hotel"),
-        ("Bar / Lounge", "bar lounge"),
-        ("Cafe", "cafe coffee"),
-        ("Banquet Hall", "banquet event center"),
-        ("Kitchen", "commercial kitchen"),
-        ("New Build", "__tag:new_construction"),
-        ("Remodel", "__tag:remodel"),
-    ]
+    // Simplified: Auto-search for restaurants + hotels
+    // No category selector needed
 
     var body: some View {
         NavigationStack {
@@ -146,19 +137,7 @@ struct HomeView: View {
                 .accessibilityIdentifier("home_button_search")
             }
 
-            // Category pills
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(Array(searchCategories.enumerated()), id: \.offset) { index, category in
-                        CategoryPill(
-                            label: category.label,
-                            isSelected: viewModel.selectedCategory == index
-                        ) {
-                            viewModel.selectedCategory = index
-                        }
-                    }
-                }
-            }
+            // Simplified: No category selector - auto searches restaurants + hotels
 
             // Area lock indicator
             if viewModel.areaLocked {
@@ -385,10 +364,11 @@ struct HomeView: View {
     // MARK: - Actions
 
     private func performSearch() {
-        let query = searchCategories[viewModel.selectedCategory].query
+        // Auto-search for restaurants AND hotels (combined query)
+        let combinedQuery = "restaurant hotel"
         Task<Void, Never> {
             await viewModel.search(
-                query: query,
+                query: combinedQuery,
                 stateCode: viewModel.searchState,
                 city: viewModel.searchCity.isEmpty ? nil : viewModel.searchCity
             )
