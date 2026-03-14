@@ -7,3 +7,9 @@ DerivedData/
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# Desktop (Tauri)
+desktop/node_modules/
+desktop/dist/
+desktop/src-tauri/target/
+desktop/.beads/
