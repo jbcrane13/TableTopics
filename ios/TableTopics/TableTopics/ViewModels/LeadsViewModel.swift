@@ -34,6 +34,18 @@ final class LeadsViewModel {
     var lockedState: String = ""
     var lockedCity: String?
     
+    /// Test mode: enrich first lead with Apollo, next 5 with Hunter only
+    var testModeEnabled: Bool {
+        get { apiService.isTestModeEnabled }
+        set {
+            if newValue {
+                apiService.enableTestMode(apolloCount: 1, hunterCount: 5)
+            } else {
+                apiService.disableTestMode()
+            }
+        }
+    }
+    
     private let apiService = APIService.shared
     private let areaLockKey = "com.tabletopics.areaLock"
     private let areaLockStateKey = "com.tabletopics.areaLockState"

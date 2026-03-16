@@ -148,6 +148,7 @@ struct LeadListView: View {
                     NavigationLink(value: lead) {
                         LeadCardRow(lead: lead)
                     }
+                    .accessibilityIdentifier("lead_list_nav_link")
                     .buttonStyle(.plain)
                 }
             }

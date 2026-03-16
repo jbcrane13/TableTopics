@@ -132,6 +132,29 @@ struct SettingsSheet: View {
                 } header: {
                     Text("Data Source")
                 }
+
+                // Enrichment Test Mode
+                Section {
+                    Toggle("Test Mode", isOn: $viewModel.testModeEnabled)
+                        .toggleStyle(.switch)
+                        .accessibilityIdentifier("settings_toggle_test_mode")
+
+                    if viewModel.testModeEnabled {
+                        Text("1st lead: Apollo (10 free/mo)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("Next 5 leads: Hunter only (50 free/mo)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("Remaining: Pattern matching (free)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                } header: {
+                    Text("Enrichment Test Mode")
+                } footer: {
+                    Text("Test mode preserves Apollo credits by using Hunter for most enrichment.")
+                }
             }
             .navigationTitle("Settings")
             #if os(iOS)

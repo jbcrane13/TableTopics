@@ -66,6 +66,7 @@ struct ContractorSearchView: View {
                     Button("Configure API Key") {
                         showingSettings = true
                     }
+                    .accessibilityIdentifier("contractor_configure_api_button")
                 } header: {
                     Text("Shovels API")
                 } footer: {
@@ -93,6 +94,7 @@ struct ContractorSearchView: View {
                     }
                     
                     TextField("City (optional)", text: $searchCity)
+                        .accessibilityIdentifier("contractor_search_city_field")
 #if os(iOS)
                         .textInputAutocapitalization(.words)
 #endif
@@ -110,6 +112,7 @@ struct ContractorSearchView: View {
                                 viewModel.unlockArea()
                             }
                             .font(.caption)
+                            .accessibilityIdentifier("contractor_unlock_button")
                         }
                     }
                 }
@@ -125,6 +128,7 @@ struct ContractorSearchView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier("contractor_search_button")
                     .buttonStyle(.borderedProminent)
                     .disabled(!viewModel.isAPIConfigured || isSearching)
                 }
@@ -177,6 +181,7 @@ struct ContractorSearchView: View {
                 // Demo Toggle
                 Section {
                     Toggle("Use Demo Data", isOn: $viewModel.useMockData)
+                        .accessibilityIdentifier("contractor_toggle_demo_data")
                         .toggleStyle(.switch)
                     
                     Text("Demo data doesn't use API credits")
@@ -194,6 +199,7 @@ struct ContractorSearchView: View {
                     } label: {
                         Image(systemName: "arrow.clockwise")
                     }
+                    .accessibilityIdentifier("contractor_refresh_button")
                 }
                 
                 ToolbarItem(placement: .secondaryAction) {
@@ -202,6 +208,7 @@ struct ContractorSearchView: View {
                     } label: {
                         Image(systemName: viewModel.areaLocked ? "lock.fill" : "lock.open")
                     }
+                    .accessibilityIdentifier("contractor_area_lock_button")
                 }
             }
             .sheet(isPresented: $showingSettings) {
@@ -247,6 +254,7 @@ struct APIKeySheet: View {
             Form {
                 Section {
                     SecureField("Shovels API Key", text: $apiKey)
+                        .accessibilityIdentifier("apikey_securefield_key")
 #if os(iOS)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -262,6 +270,7 @@ struct APIKeySheet: View {
                         viewModel.setAPIKey(apiKey)
                         isPresented = false
                     }
+                    .accessibilityIdentifier("apikey_button_save")
                     .disabled(apiKey.isEmpty)
                     
                     if viewModel.isAPIConfigured {
@@ -269,6 +278,7 @@ struct APIKeySheet: View {
                             viewModel.clearAPIKey()
                             isPresented = false
                         }
+                        .accessibilityIdentifier("apikey_button_clear")
                     }
                 }
             }
@@ -278,6 +288,7 @@ struct APIKeySheet: View {
                     Button("Cancel") {
                         isPresented = false
                     }
+                    .accessibilityIdentifier("apikey_button_cancel")
                 }
             }
             .onAppear {
@@ -302,12 +313,14 @@ struct AreaLockSheet: View {
             Form {
                 Section {
                     TextField("State (e.g., TX)", text: $lockState)
+                        .accessibilityIdentifier("contractor_search_state_field")
 #if os(iOS)
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled()
 #endif
                     
                     TextField("City (optional)", text: $lockCity)
+                        .accessibilityIdentifier("contractor_lock_city_field")
 #if os(iOS)
                         .textInputAutocapitalization(.words)
 #endif
@@ -322,6 +335,7 @@ struct AreaLockSheet: View {
                         viewModel.lockArea(state: lockState, city: lockCity.isEmpty ? nil : lockCity)
                         isPresented = false
                     }
+                    .accessibilityIdentifier("area_lock_button_lock")
                     .disabled(lockState.count != 2)
                     
                     if viewModel.areaLocked {
@@ -329,6 +343,7 @@ struct AreaLockSheet: View {
                             viewModel.unlockArea()
                             isPresented = false
                         }
+                        .accessibilityIdentifier("area_lock_button_unlock")
                     }
                 }
             }
@@ -338,6 +353,7 @@ struct AreaLockSheet: View {
                     Button("Cancel") {
                         isPresented = false
                     }
+                    .accessibilityIdentifier("area_lock_button_cancel")
                 }
             }
             .onAppear {

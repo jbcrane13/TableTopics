@@ -9,6 +9,12 @@ private final class APIState: @unchecked Sendable {
     var apiKey: String?
     var creditsUsed: Int = 0
     var creditsRemaining: Int = 250
+    var enrichmentProvider: ContactEnrichmentService.EnrichmentProvider = .patternMatching
+    
+    /// Test mode: enrich first lead with Apollo, next 5 with Hunter only
+    var testModeEnabled = false
+    var testModeApolloCount = 1  // First N leads use Apollo
+    var testModeHunterCount = 5  // Next N leads use Hunter only
     
     init(apiKey: String?) {
         self.apiKey = apiKey
@@ -31,6 +37,9 @@ public final class APIService: Sendable {
     
     private let state: APIState
     private let userDefaultsKey = "com.tabletopics.shovelsApiKey"
+    private let enrichmentService = ContactEnrichmentService()
+    private let descriptionAnalyzer = RuleBasedDescriptionAnalyzer()
+    private let analysisCache = AnalysisCache.shared
     
     // MARK: - Init
     
@@ -54,6 +63,35 @@ public final class APIService: Sendable {
     }
     
     public var apiKey: String? { state.apiKey }
+    
+    // MARK: - Enrichment Provider
+    
+    /// Set which enrichment provider to use for contact discovery
+    public func setEnrichmentProvider(_ provider: ContactEnrichmentService.EnrichmentProvider) {
+        state.enrichmentProvider = provider
+    }
+    
+    public var enrichmentProvider: ContactEnrichmentService.EnrichmentProvider {
+        state.enrichmentProvider
+    }
+    
+    // MARK: - Test Mode
+    
+    /// Enable test mode: first N leads use Apollo, next M leads use Hunter only
+    /// This preserves Apollo credits (10 free/mo) by using Hunter (50 free/mo) for most enrichment
+    public func enableTestMode(apolloCount: Int = 1, hunterCount: Int = 5) {
+        state.testModeEnabled = true
+        state.testModeApolloCount = apolloCount
+        state.testModeHunterCount = hunterCount
+    }
+    
+    public func disableTestMode() {
+        state.testModeEnabled = false
+    }
+    
+    public var isTestModeEnabled: Bool {
+        state.testModeEnabled
+    }
     
     // MARK: - Search Methods
     
@@ -105,33 +143,120 @@ public final class APIService: Sendable {
             throw APIError.noResults
         }
         
-        // Build leads from permit data
+        // Pre-fetch contractor details for permits that have contractor IDs
+        var contractorCache: [String: ShovelsContractor] = [:]
+        let contractorIds = permits.compactMap { $0.contractorId }
+        print("[APIService] Found \(permits.count) permits, \(contractorIds.count) have contractorId")
+        for contractorId in Set(contractorIds) {
+            do {
+                if let contractor = try await shovels.getContractor(byId: contractorId) {
+                    contractorCache[contractorId] = contractor
+                    print("[APIService] Fetched contractor: \(contractor.businessName ?? contractor.name ?? "unnamed")")
+                }
+            } catch {
+                print("[APIService] Failed to fetch contractor \(contractorId): \(error)")
+            }
+        }
+        print("[APIService] Contractor cache: \(contractorCache.count) contractors fetched")
+
+        // Pre-analyze all permits for description relevance (with caching)
+        let permitInputs = permits.map { permit in
+            DescriptionInput(
+                id: permit.id,
+                description: permit.description,
+                permitType: permit.tags?.first.flatMap { PermitType(rawValue: $0) } ?? .other,
+                estimatedValue: permit.jobValue.map { Double($0) / 100.0 },
+                jurisdiction: permit.jurisdiction
+            )
+        }
+        let analyses = await analysisCache.getOrComputeBatch(permits: permitInputs, analyzer: descriptionAnalyzer)
+        
+        // Filter out rejected permits (residential minor, utility, etc.)
+        let rejectedCount = analyses.values.filter { $0.shouldReject }.count
+        if rejectedCount > 0 {
+            print("[APIService] Filtered out \(rejectedCount) non-commercial permits")
+        }
+
+        // Build leads from permit data (skip rejected)
         var leads: [Lead] = []
-        for permit in permits {
-            let project = permit.toProject()
+        for (index, permit) in permits.enumerated() {
+            // Check if this permit should be filtered out
+            guard let analysis = analyses[permit.id], !analysis.shouldReject else {
+                continue
+            }
             
-            // Use property owner as the company (they're the buyer),
-            // fall back to permit jurisdiction/description
-            let companyName = permit.propertyLegalOwner
+            let project = permit.toProject()
+
+            // Try to get contractor info from the pre-fetched cache
+            let contractor: ShovelsContractor? = permit.contractorId.flatMap { contractorCache[$0] }
+
+            // Use contractor name if available, otherwise fall back to property owner/jurisdiction
+            // Note: contractor.businessName is the actual company, propertyLegalOwner is often a city name
+            let companyName = contractor?.businessName
+                ?? contractor?.name
+                ?? permit.propertyLegalOwner
                 ?? permit.jurisdiction
                 ?? "Commercial Project"
-            
+
+            // Determine license status from contractor's statusTally
+            var licStatus: LicenseStatus = .unknown
+            if let tally = contractor?.statusTally {
+                if tally["active"] != nil && (tally["active"] ?? 0) > 0 {
+                    licStatus = .active
+                } else if tally["inactive"] != nil {
+                    licStatus = .inactive
+                }
+            }
+
             let company = Company(
                 id: UUID(),
                 name: companyName,
-                address: permit.address?.toAddress() ?? Address(),
-                phone: nil,
-                email: nil,
-                website: nil
+                address: contractor?.address?.toAddress() ?? permit.address?.toAddress() ?? Address(),
+                phone: contractor?.primaryPhone ?? contractor?.phone?.components(separatedBy: ",").first,
+                email: contractor?.primaryEmail ?? contractor?.email?.components(separatedBy: ",").first,
+                website: contractor?.website.flatMap { URL(string: $0.hasPrefix("http") ? $0 : "https://\($0)") },
+                licenseNumber: contractor?.license,
+                licenseStatus: licStatus,
+                yearsInBusiness: nil,
+                completedProjects: contractor?.statusTally?["final"],
+                totalProjects: contractor?.permitCount,
+                rating: contractor?.rating
             )
-            
+
             var lead = Lead(
                 company: company,
                 project: project,
                 source: .permitScout
             )
-            
-            lead.updateScore(LeadScore.calculate(for: lead))
+
+            // Enrich with contact information
+            do {
+                if state.testModeEnabled {
+                    // Test mode: first N with Apollo, next M with Hunter only
+                    let mode: EnrichmentMode
+                    if index < state.testModeApolloCount {
+                        mode = .apolloFirst
+                    } else if index < state.testModeApolloCount + state.testModeHunterCount {
+                        mode = .hunterOnly
+                    } else {
+                        mode = .patternOnly  // Remaining leads use free pattern matching
+                    }
+                    _ = try await enrichmentService.enrichLead(&lead, mode: mode, maxContacts: 3)
+                } else {
+                    try await enrichmentService.enrichLead(&lead, provider: state.enrichmentProvider, maxContacts: 3)
+                }
+            } catch {
+                // Enrichment failed - keep lead without additional contacts
+                // This is acceptable; leads can still be scored and contacted manually
+            }
+
+            // Score with description analysis
+            let scoringService = DefaultScoringService()
+            if let analysis = analyses[permit.id] {
+                lead.updateScore(scoringService.score(lead: lead, descriptionAnalysis: analysis))
+            } else {
+                lead.updateScore(LeadScore.calculate(for: lead))
+            }
             leads.append(lead)
         }
         

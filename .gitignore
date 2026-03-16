@@ -13,3 +13,7 @@ desktop/node_modules/
 desktop/dist/
 desktop/src-tauri/target/
 desktop/.beads/
+**/__pycache__/
+*.pyc
+*.xcworkspace/xcuserdata/
+.beads/dolt-monitor.pid.lock
