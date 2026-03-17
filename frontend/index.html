@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Table Topics | Sales Pro</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#05020a">
+  <!-- Enable web app capable for iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+
+  <!-- Dynamic Animated Mesh Gradient -->
+  <div class="mesh-bg"></div>
+
+  <!-- Mobile Constrained Frame -->
+  <div class="mobile-frame">
+    
+    <header class="header">
+      <div class="header-top">
+        <h1>TableTopics</h1>
+        <div class="user-avatar">
+          <div class="inner">SP</div>
+        </div>
+      </div>
+      
+      <div class="search-bar glass">
+        <input type="text" placeholder="Search cities, permits...">
+        <button class="search-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="scroll-pills-container">
+      <div class="scroll-pills">
+        <div class="glass-pill glass active" data-filter="all">All Needs</div>
+        <div class="glass-pill glass" data-filter="restaurant">Restaurants</div>
+        <div class="glass-pill glass" data-filter="hotel">Hotels</div>
+        <div class="glass-pill glass" data-filter="banquet">Banquet</div>
+        <div class="glass-pill glass" data-filter="cafe">Cafe</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box glass" style="--stat-color: var(--color-hot);">
+        <div class="stat-val">12</div>
+        <div class="stat-lbl">Hot Leads</div>
+      </div>
+      <div class="stat-box glass" style="--stat-color: var(--color-cool);">
+        <div class="stat-val">$8M</div>
+        <div class="stat-lbl">Pipeline</div>
+      </div>
+      <div class="stat-box glass" style="--stat-color: #ffffff;">
+        <div class="stat-val">45</div>
+        <div class="stat-lbl">Discovered</div>
+      </div>
+    </div>
+
+    <div class="leads-list" id="leads-list">
+      <!-- Cards injected by JS -->
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -17,3 +17,8 @@ desktop/.beads/
 *.pyc
 *.xcworkspace/xcuserdata/
 .beads/dolt-monitor.pid.lock
+ios/ExportOptions.plist
+ios/build/
+standalone3.html
+preview_*.png
+.claude/worktrees/

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Table Topics | Sales Pro</title>
+  <link rel="stylesheet" href="styles2.css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+
+  <div class="bg-base"></div>
+  <div class="bg-mesh"></div>
+
+  <div class="app-frame">
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1" fill="currentColor" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12"><path d="M7.5 2.2C5.3 2.2 3.3 3.1 1.9 4.6L0.5 3.2C2.3 1.2 4.8 0 7.5 0s5.2 1.2 7 3.2L13.1 4.6C11.7 3.1 9.7 2.2 7.5 2.2z" fill="currentColor"/><path d="M7.5 5.4c-1.4 0-2.6.6-3.5 1.5L2.5 5.4C3.8 4 5.6 3.2 7.5 3.2s3.7.8 5 2.2L11 6.9C10.1 6 8.9 5.4 7.5 5.4z" fill="currentColor" opacity=".8"/><circle cx="7.5" cy="9.5" r="2" fill="currentColor"/></svg>
+        <div class="battery-icon"><div class="battery-level"></div><div class="battery-nub"></div></div>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-row">
+        <img src="logo.svg" alt="Table Topics" class="logo" />
+        <div class="header-controls">
+          <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button class="avatar-btn" aria-label="Profile"><span>SP</span></button>
+        </div>
+      </div>
+      <div class="search-wrap glass-card">
+        <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" placeholder="Search cities, permits, contractors…">
+        <button class="search-run-btn" id="searchBtn" aria-label="Run search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- FILTER PILLS -->
+    <div class="pills-scroll">
+      <div class="pills-inner">
+        <button class="filter-pill active" data-filter="all">All Needs</button>
+        <button class="filter-pill" data-filter="restaurant">Restaurants</button>
+        <button class="filter-pill" data-filter="hotel">Hotels</button>
+        <button class="filter-pill" data-filter="banquet">Banquet</button>
+        <button class="filter-pill" data-filter="cafe">Cafe</button>
+        <button class="filter-pill" data-filter="bar">Bar &amp; Lounge</button>
+      </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card glass-card">
+        <div class="stat-dot stat-hot-dot"></div>
+        <div class="stat-num">12</div>
+        <div class="stat-label">Hot Leads</div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-dot stat-pipeline-dot"></div>
+        <div class="stat-num">$8M</div>
+        <div class="stat-label">Pipeline</div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-dot stat-total-dot"></div>
+        <div class="stat-num">45</div>
+        <div class="stat-label">Discovered</div>
+      </div>
+    </div>
+
+    <!-- SECTION HEADER -->
+    <div class="section-header">
+      <span class="section-title">Active Leads</span>
+      <button class="sort-btn glass-card">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Sort
+      </button>
+    </div>
+
+    <!-- LEADS LIST -->
+    <div class="leads-list" id="leads-list"></div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav glass-card">
+      <button class="nav-item active">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Leads</span>
+      </button>
+      <button class="nav-item">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Search</span>
+      </button>
+      <button class="nav-item">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Pipeline</span>
+      </button>
+      <button class="nav-item">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script src="app2.js"></script>
+</body>
+</html>
