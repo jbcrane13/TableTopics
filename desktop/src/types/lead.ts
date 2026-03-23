@@ -1,16 +1,52 @@
+export interface Contact {
+  id: string;
+  initials: string;
+  name: string;
+  title: string;
+  confidence: number; // 0-100
+  avatarGradient: 'purple' | 'ember' | 'cyan';
+}
+
+export interface ScoreBreakdown {
+  label: string;
+  value: string;
+  pct: number; // 0-100
+  barType: 'ember' | 'gold' | 'success' | 'info';
+}
+
+export interface EnrichmentInsights {
+  businessChallenges: string[];
+  techStack: string[];
+  aiSignals: string[];
+}
+
+export interface RecentPermit {
+  property: string;
+  type: string;
+  value: string;
+  date: string;
+}
+
 export interface Lead {
   id: string;
   companyName: string;
-  contactName?: string;
-  email?: string;
-  phone?: string;
-  industry: string;
+  emoji: string;
+  score: number;
+  scoreType: 'hot' | 'warm' | 'cool';
+  contractor: string;
+  owner: string;
   location: string;
-  score: number; // 0–100
-  status: "new" | "contacted" | "qualified" | "proposal_sent" | "closed";
-  enriched: boolean;
-  createdAt: string;
-  updatedAt: string;
+  projectValue: string;
+  sqft: string;
+  permitType: string;
+  filedDate: string;
+  estFurnitureValue: string;
+  status: 'new' | 'contacted' | 'qualified' | 'proposal_sent';
+  contacts: Contact[];
+  scoreBreakdown: ScoreBreakdown[];
+  enrichment: EnrichmentInsights;
+  permits: RecentPermit[];
+  verifiedCount: number;
 }
 
 export interface EnrichmentData {
@@ -18,7 +54,7 @@ export interface EnrichmentData {
   description?: string;
   projectValue?: number;
   permits?: Permit[];
-  contactQuality: "low" | "medium" | "high";
+  contactQuality: 'low' | 'medium' | 'high';
   lastActivity?: string;
 }
 
@@ -34,8 +70,8 @@ export interface Proposal {
   id: string;
   leadId: string;
   title: string;
-  content: string; // TipTap JSON
-  status: "draft" | "sent" | "accepted" | "rejected";
+  content: string;
+  status: 'draft' | 'sent' | 'accepted' | 'rejected';
   createdAt: string;
   updatedAt: string;
 }

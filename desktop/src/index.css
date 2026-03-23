@@ -1,1 +1,76 @@
 @import "tailwindcss";
+
+@theme {
+  --color-bg-deep: #0C0B0F;
+  --color-bg-surface: #141318;
+  --color-bg-card: #1A191F;
+  --color-bg-card-hover: #201F26;
+  --color-bg-elevated: #242329;
+  --color-border-subtle: rgba(255,255,255,0.06);
+  --color-border-medium: rgba(255,255,255,0.1);
+  --color-text-primary: #EDEADF;
+  --color-text-secondary: rgba(237,234,223,0.6);
+  --color-text-muted: rgba(237,234,223,0.35);
+  --color-ember: #E8672A;
+  --color-ember-soft: rgba(232,103,42,0.15);
+  --color-ember-glow: rgba(232,103,42,0.08);
+  --color-gold: #D4A847;
+  --color-gold-soft: rgba(212,168,71,0.12);
+  --color-success: #4ADE80;
+  --color-success-soft: rgba(74,222,128,0.12);
+  --color-info: #7C9CBF;
+  --color-info-soft: rgba(124,156,191,0.1);
+  --color-danger: #EF4444;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'DM Sans', -apple-system, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-medium); border-radius: 3px; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.1s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.2s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.3s; }
+.delay-7 { animation-delay: 0.35s; }
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bar-ember { background: linear-gradient(90deg, #E8672A, #F5923A); }
+.bar-gold { background: linear-gradient(90deg, #D4A847, #E8C75A); }
+.bar-success { background: linear-gradient(90deg, #4ADE80, #6EE7A0); }
+.bar-info { background: linear-gradient(90deg, #7C9CBF, #A8BFDB); }
