@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TableTopics LeadForge — UI Mockup v3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0C0B0F;
+    --bg-surface: #141318;
+    --bg-card: #1A191F;
+    --bg-card-hover: #201F26;
+    --bg-elevated: #242329;
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-medium: rgba(255,255,255,0.1);
+    --text-primary: #EDEADF;
+    --text-secondary: rgba(237,234,223,0.6);
+    --text-muted: rgba(237,234,223,0.35);
+    --accent-ember: #E8672A;
+    --accent-ember-soft: rgba(232,103,42,0.15);
+    --accent-ember-glow: rgba(232,103,42,0.08);
+    --accent-gold: #D4A847;
+    --accent-gold-soft: rgba(212,168,71,0.12);
+    --success: #4ADE80;
+    --success-soft: rgba(74,222,128,0.12);
+    --warning: #FBBF24;
+    --warning-soft: rgba(251,191,36,0.12);
+    --info: #7C9CBF;
+    --info-soft: rgba(124,156,191,0.1);
+    --danger: #EF4444;
+    --score-hot: #E8672A;
+    --score-warm: #D4A847;
+    --score-cool: #7C9CBF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* ===== TITLEBAR ===== */
+  .titlebar {
+    height: 46px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    -webkit-app-region: drag;
+    position: relative;
+    z-index: 10;
+  }
+  .titlebar::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-ember-glow) 30%, var(--accent-ember-soft) 50%, var(--accent-ember-glow) 70%, transparent);
+  }
+
+  .logo-mark {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--accent-ember), var(--accent-gold));
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #0C0B0F;
+  }
+  .app-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 15px; color: var(--text-primary); letter-spacing: 0.3px;
+  }
+  .title-divider { width: 1px; height: 16px; background: var(--border-medium); }
+  .title-context { font-size: 12px; color: var(--text-muted); }
+
+  /* Top nav tabs */
+  .top-nav {
+    display: flex; gap: 4px; margin-left: 16px;
+    -webkit-app-region: no-drag;
+  }
+  .top-nav-item {
+    font-size: 12px; font-weight: 500; color: var(--text-muted);
+    padding: 4px 12px; border-radius: 5px;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .top-nav-item:hover { color: var(--text-secondary); }
+  .top-nav-item.active {
+    color: var(--accent-ember);
+    background: var(--accent-ember-soft);
+  }
+
+  /* Top stats bar */
+  .top-stats {
+    margin-left: auto;
+    display: flex; gap: 16px; align-items: center;
+    -webkit-app-region: no-drag;
+    font-size: 11.5px; color: var(--text-muted);
+  }
+  .top-stat { display: flex; align-items: center; gap: 4px; }
+  .top-stat-icon { font-size: 12px; }
+  .top-stat-value { color: var(--text-secondary); font-weight: 500; }
+
+  .titlebar-actions {
+    display: flex; gap: 6px; align-items: center;
+    -webkit-app-region: no-drag;
+    margin-left: 12px;
+  }
+  .titlebar-btn {
+    background: none; border: none; color: var(--text-secondary);
+    font-size: 11px; cursor: pointer; padding: 4px 10px;
+    border-radius: 4px; transition: all 0.15s; font-family: inherit;
+  }
+  .titlebar-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+  .body-container { display: flex; flex: 1; overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 262px;
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column; flex-shrink: 0;
+  }
+
+  .sidebar-header {
+    padding: 14px 14px 10px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 8px; padding: 7px 10px; transition: border-color 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--accent-ember); }
+  .search-icon { font-size: 13px; color: var(--text-muted); }
+  .search-box input {
+    background: none; border: none; outline: none;
+    color: var(--text-primary); font-size: 12.5px; font-family: inherit; width: 100%;
+  }
+  .search-box input::placeholder { color: var(--text-muted); }
+
+  .filter-row { display: flex; gap: 6px; }
+  .filter-chip {
+    font-size: 11px; padding: 3px 9px; border-radius: 20px;
+    border: 1px solid var(--border-subtle); background: transparent;
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .filter-chip:hover { border-color: var(--border-medium); color: var(--text-primary); }
+  .filter-chip.active {
+    background: var(--accent-ember-soft); border-color: rgba(232,103,42,0.3); color: var(--accent-ember);
+  }
+
+  .lead-list {
+    flex: 1; overflow-y: auto; padding: 6px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+
+  .lead-card {
+    padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; position: relative; border: 1px solid transparent;
+  }
+  .lead-card:hover { background: var(--bg-card); }
+  .lead-card.selected { background: var(--bg-card); border-color: var(--border-medium); }
+  .lead-card.selected::before {
+    content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 2px; background: var(--accent-ember); border-radius: 2px;
+  }
+
+  .lead-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; }
+  .lead-company { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+
+  .lead-score {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+  }
+  .lead-score.hot { color: var(--score-hot); background: var(--accent-ember-soft); }
+  .lead-score.warm { color: var(--score-warm); background: var(--accent-gold-soft); }
+  .lead-score.cool { color: var(--score-cool); background: var(--info-soft); }
+
+  .lead-detail-line {
+    font-size: 11px; color: var(--text-muted);
+    display: flex; gap: 6px; align-items: center; margin-top: 1px;
+  }
+  .lead-detail-line .company-name { color: var(--text-secondary); }
+
+  .lead-meta {
+    font-size: 10.5px; color: var(--text-muted);
+    display: flex; gap: 6px; align-items: center; margin-top: 3px;
+  }
+
+  .lead-status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot-new { background: var(--success); }
+  .dot-contacted { background: var(--accent-gold); }
+  .dot-qualified { background: var(--accent-ember); }
+  .dot-proposal { background: var(--info); }
+
+  .verified-badge {
+    font-size: 10px; color: var(--success); display: flex; align-items: center; gap: 2px;
+  }
+
+  .sidebar-footer {
+    padding: 10px 14px; border-top: 1px solid var(--border-subtle);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .lead-count { font-size: 11px; color: var(--text-muted); }
+  .add-lead-btn {
+    background: var(--accent-ember); border: none; color: #fff;
+    font-size: 11px; font-weight: 600; padding: 5px 12px;
+    border-radius: 6px; cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .add-lead-btn:hover { filter: brightness(1.1); }
+
+  /* ===== CENTER PANEL ===== */
+  .center-panel {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    background: var(--bg-deep); position: relative;
+  }
+  .center-panel::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--accent-ember-glow), transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Profile header */
+  .profile-header { padding: 20px 28px 0; position: relative; z-index: 1; }
+
+  .profile-top-row {
+    display: flex; align-items: flex-start; gap: 16px; margin-bottom: 8px;
+  }
+
+  .profile-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+
+  .profile-info { flex: 1; }
+
+  .profile-company-name {
+    font-family: 'Instrument Serif', serif; font-size: 24px;
+    font-weight: 400; color: var(--text-primary); line-height: 1.2;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .profile-score-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent-ember-soft); color: var(--accent-ember);
+    border: 2px solid var(--accent-ember); flex-shrink: 0;
+  }
+
+  .profile-meta {
+    font-size: 12px; color: var(--text-secondary); margin-top: 4px;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .profile-meta-dot { color: var(--text-muted); }
+
+  .profile-status-row {
+    display: flex; align-items: center; gap: 12px; margin-top: 6px;
+  }
+
+  .status-pill {
+    font-size: 10.5px; padding: 2px 10px; border-radius: 20px; font-weight: 500;
+  }
+  .status-qualified { background: var(--success-soft); color: var(--success); }
+
+  .est-value {
+    font-size: 13px; font-weight: 600; color: var(--accent-gold);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .est-value-label { font-size: 11px; color: var(--text-muted); font-weight: 400; font-family: 'DM Sans', sans-serif; }
+
+  .profile-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .action-btn {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    color: var(--text-secondary); font-size: 12px; padding: 6px 14px;
+    border-radius: 7px; cursor: pointer; font-family: inherit; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .action-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--border-medium); }
+  .action-btn.primary { background: var(--accent-ember); border-color: var(--accent-ember); color: #fff; }
+  .action-btn.primary:hover { filter: brightness(1.1); }
+
+  /* Project stats row */
+  .project-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    margin: 16px 28px 0; position: relative; z-index: 1;
+  }
+
+  .project-stat {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 8px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .stat-icon {
+    width: 32px; height: 32px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .stat-icon.money { background: var(--accent-gold-soft); color: var(--accent-gold); }
+  .stat-icon.size { background: var(--info-soft); color: var(--info); }
+  .stat-icon.type { background: var(--accent-ember-soft); color: var(--accent-ember); }
+  .stat-icon.date { background: var(--success-soft); color: var(--success); }
+
+  .stat-data {}
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600;
+    color: var(--text-primary); line-height: 1.2;
+  }
+  .stat-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-muted); margin-top: 2px;
+  }
+
+  /* Content scroll area */
+  .content-scroll {
+    flex: 1; overflow-y: auto; padding: 20px 28px; position: relative; z-index: 1;
+  }
+
+  /* ===== LEAD SCORE BREAKDOWN (horizontal bars) ===== */
+  .section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--text-muted);
+  }
+  .section-badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 12px;
+    background: var(--accent-ember-soft); color: var(--accent-ember); font-weight: 500;
+  }
+
+  .score-bars {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 10px; padding: 4px 0; margin-bottom: 20px;
+  }
+
+  .score-bar-row {
+    display: flex; align-items: center; padding: 10px 18px; gap: 16px;
+  }
+  .score-bar-row + .score-bar-row { border-top: 1px solid var(--border-subtle); }
+
+  .score-bar-label {
+    font-size: 12.5px; color: var(--text-secondary); width: 160px; flex-shrink: 0;
+  }
+
+  .score-bar-track {
+    flex: 1; height: 6px; background: rgba(255,255,255,0.06);
+    border-radius: 3px; overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bar-ember { background: linear-gradient(90deg, var(--accent-ember), #F5923A); }
+  .bar-gold { background: linear-gradient(90deg, var(--accent-gold), #E8C75A); }
+  .bar-success { background: linear-gradient(90deg, var(--success), #6EE7A0); }
+  .bar-info { background: linear-gradient(90deg, var(--info), #A8BFDB); }
+
+  .score-bar-value {
+    font-size: 12px; color: var(--text-secondary); width: 120px;
+    text-align: right; flex-shrink: 0;
+  }
+
+  /* ===== DECISION MAKERS (contacts front & center) ===== */
+  .decision-makers {
+    margin-bottom: 20px;
+  }
+
+  .contact-list {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .contact-row {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 10px; padding: 12px 16px;
+    transition: border-color 0.15s;
+  }
+  .contact-row:hover { border-color: var(--border-medium); }
+
+  .contact-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: #fff; flex-shrink: 0;
+    letter-spacing: -0.5px;
+  }
+  .avatar-1 { background: linear-gradient(135deg, #6366F1, #8B5CF6); }
+  .avatar-2 { background: linear-gradient(135deg, var(--accent-ember), #F59E0B); }
+  .avatar-3 { background: linear-gradient(135deg, #06B6D4, #3B82F6); }
+
+  .contact-info { flex: 1; }
+
+  .contact-name-row { display: flex; align-items: center; gap: 8px; }
+  .contact-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+  .contact-confidence {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 4px;
+    background: var(--success-soft); color: var(--success);
+  }
+
+  .contact-title { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+
+  .contact-actions { display: flex; gap: 8px; }
+  .contact-action-btn {
+    width: 32px; height: 32px; border-radius: 7px;
+    background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .contact-action-btn:hover { background: var(--accent-ember-soft); color: var(--accent-ember); border-color: rgba(232,103,42,0.3); }
+
+  /* ===== ENRICHMENT INSIGHTS (tag chips) ===== */
+  .enrichment-insights { margin-bottom: 20px; }
+
+  .insight-group { margin-bottom: 12px; }
+  .insight-group-label {
+    font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;
+  }
+  .insight-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .insight-tag {
+    font-size: 11.5px; padding: 4px 12px; border-radius: 6px;
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    color: var(--text-secondary); transition: all 0.15s;
+  }
+  .insight-tag:hover { border-color: var(--border-medium); color: var(--text-primary); }
+
+  /* Permits mini-table */
+  .permits-section { margin-bottom: 20px; }
+  .permits-card {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 10px; overflow: hidden;
+  }
+  .permits-table { width: 100%; border-collapse: collapse; }
+  .permits-table th {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-muted); text-align: left; padding: 8px 14px;
+    border-bottom: 1px solid var(--border-subtle); font-weight: 600;
+  }
+  .permits-table td {
+    font-size: 12px; color: var(--text-secondary); padding: 10px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .permits-table tr:last-child td { border-bottom: none; }
+  .permits-table td:first-child { color: var(--text-primary); font-weight: 500; }
+  .permit-value { font-family: 'JetBrains Mono', monospace; color: var(--accent-gold) !important; }
+
+  /* ===== RIGHT PANEL (Copilot) ===== */
+  .copilot-panel {
+    width: 320px; background: var(--bg-surface);
+    border-left: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column; flex-shrink: 0;
+  }
+
+  .copilot-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .copilot-title {
+    font-size: 12.5px; font-weight: 600; color: var(--text-primary);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .copilot-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--success); animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* Copilot mode tabs */
+  .copilot-tabs {
+    display: flex; gap: 4px; padding: 10px 16px 6px;
+  }
+  .copilot-tab {
+    font-size: 11px; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--border-subtle); background: transparent;
+    color: var(--text-muted); cursor: pointer; font-family: inherit;
+    font-weight: 500; transition: all 0.15s;
+  }
+  .copilot-tab:hover { color: var(--text-secondary); border-color: var(--border-medium); }
+  .copilot-tab.active {
+    background: var(--accent-ember-soft); border-color: rgba(232,103,42,0.3);
+    color: var(--accent-ember);
+  }
+
+  /* Context tags */
+  .copilot-context {
+    padding: 8px 16px 4px;
+  }
+  .context-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--text-muted); margin-bottom: 6px; font-weight: 600;
+  }
+  .context-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .context-tag {
+    font-size: 10.5px; padding: 2px 8px; border-radius: 4px;
+    background: var(--bg-elevated); color: var(--text-secondary);
+  }
+
+  .copilot-chat {
+    flex: 1; overflow-y: auto; padding: 12px 16px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  .ai-draft-label {
+    font-size: 10.5px; font-weight: 600; color: var(--accent-ember);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    display: flex; align-items: center; gap: 4px; margin-bottom: 4px;
+  }
+
+  .ai-draft-title {
+    font-family: 'Instrument Serif', serif; font-size: 16px;
+    color: var(--text-primary); margin-bottom: 10px; line-height: 1.3;
+  }
+
+  .ai-message {
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 12.5px; color: var(--text-secondary); line-height: 1.65;
+  }
+  .ai-message strong { color: var(--text-primary); font-weight: 600; }
+  .ai-message .highlight { color: var(--accent-ember); font-weight: 500; }
+
+  .ai-draft-value {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent-gold); margin-top: 10px;
+  }
+
+  .copilot-input-area {
+    padding: 12px 16px; border-top: 1px solid var(--border-subtle);
+  }
+  .copilot-input {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    border-radius: 8px; padding: 8px 12px;
+  }
+  .copilot-input input {
+    background: none; border: none; outline: none;
+    color: var(--text-primary); font-size: 12.5px; font-family: inherit; width: 100%;
+  }
+  .copilot-input input::placeholder { color: var(--text-muted); }
+  .send-btn {
+    background: var(--accent-ember); border: none; color: #fff;
+    width: 26px; height: 26px; border-radius: 6px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; transition: all 0.15s; flex-shrink: 0;
+  }
+  .send-btn:hover { filter: brightness(1.1); }
+
+  /* Bottom bar */
+  .bottom-bar {
+    height: 28px; background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 10.5px; color: var(--text-muted);
+    position: relative; z-index: 10;
+  }
+  .bottom-shortcuts { display: flex; gap: 16px; }
+  .shortcut { display: flex; align-items: center; gap: 4px; }
+  .shortcut kbd {
+    background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+    border-radius: 3px; padding: 0px 4px; font-family: inherit; font-size: 9.5px;
+  }
+  .bottom-integrations { display: flex; gap: 12px; align-items: center; }
+  .integration-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 3px; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in { animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .delay-1 { animation-delay: 0.05s; }
+  .delay-2 { animation-delay: 0.1s; }
+  .delay-3 { animation-delay: 0.15s; }
+  .delay-4 { animation-delay: 0.2s; }
+  .delay-5 { animation-delay: 0.25s; }
+  .delay-6 { animation-delay: 0.3s; }
+  .delay-7 { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="logo-mark">TT</div>
+    <span class="app-title">LeadForge</span>
+    <div class="title-divider"></div>
+
+    <div class="top-nav">
+      <button class="top-nav-item active">Leads</button>
+      <button class="top-nav-item">Pipeline</button>
+      <button class="top-nav-item">Proposals</button>
+    </div>
+
+    <div class="top-stats">
+      <div class="top-stat"><span class="top-stat-icon">🔥</span> <span class="top-stat-value">2 Hot</span></div>
+      <div class="top-stat"><span class="top-stat-icon">$</span> <span class="top-stat-value">$1.9M Pipeline</span></div>
+      <div class="top-stat"><span class="top-stat-icon">📋</span> <span class="top-stat-value">8 Permits</span></div>
+    </div>
+
+    <div class="titlebar-actions">
+      <button class="titlebar-btn">⚙</button>
+      <button class="titlebar-btn">⟳</button>
+    </div>
+  </div>
+
+  <div class="body-container">
+
+    <!-- LEFT: Lead List -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="search-box">
+          <span class="search-icon">⌕</span>
+          <input placeholder="Search companies, contacts…" />
+        </div>
+        <div class="filter-row">
+          <button class="filter-chip active">All</button>
+          <button class="filter-chip">Hot</button>
+          <button class="filter-chip">New</button>
+          <button class="filter-chip">Qualified</button>
+        </div>
+      </div>
+
+      <div class="lead-list">
+        <div class="lead-card animate-in delay-1">
+          <div class="lead-card-header">
+            <span class="lead-company">Walt Disney World Resort</span>
+            <span class="lead-score hot">96</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Turner Construction</span>
+          </div>
+          <div class="lead-meta">
+            <span>$4.2M</span> <span>·</span> <span>48,000 sqft</span>
+            <span style="margin-left:auto" class="verified-badge">✓ 3 verified</span>
+          </div>
+        </div>
+
+        <div class="lead-card selected animate-in delay-2">
+          <div class="lead-card-header">
+            <span class="lead-company">Marriott Bethesda Renovation</span>
+            <span class="lead-score hot">96</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Turner Construction</span>
+          </div>
+          <div class="lead-meta">
+            <span>$4.2M</span> <span>·</span> <span>48,000 sqft</span>
+            <span style="margin-left:auto"><span class="lead-status-dot dot-qualified"></span> Qualified</span>
+            <span class="verified-badge">✓ 3 verified</span>
+          </div>
+        </div>
+
+        <div class="lead-card animate-in delay-3">
+          <div class="lead-card-header">
+            <span class="lead-company">Hilton Orlando Tower E…</span>
+            <span class="lead-score hot">91</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Hensel Phelps</span>
+          </div>
+          <div class="lead-meta">
+            <span>$12.8M</span> <span>·</span> <span>120,000 sqft</span>
+            <span style="margin-left:auto"><span class="lead-status-dot dot-contacted"></span> Contacted</span>
+            <span class="verified-badge">✓ 2 verified</span>
+          </div>
+        </div>
+
+        <div class="lead-card animate-in delay-4">
+          <div class="lead-card-header">
+            <span class="lead-company">Darden HQ Lobby Remo…</span>
+            <span class="lead-score warm">78</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Brasfield & Gorrie</span>
+          </div>
+          <div class="lead-meta">
+            <span>$1.8M</span> <span>·</span> <span>15,000 sqft</span>
+            <span style="margin-left:auto"><span class="lead-status-dot dot-new"></span> New</span>
+            <span class="verified-badge">✓ 2 verified</span>
+          </div>
+        </div>
+
+        <div class="lead-card animate-in delay-5">
+          <div class="lead-card-header">
+            <span class="lead-company">Ritz-Carlton DC Res…</span>
+            <span class="lead-score warm">74</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Clark Construction</span>
+          </div>
+          <div class="lead-meta">
+            <span>$3.5M</span> <span>·</span> <span>8,200 sqft</span>
+            <span style="margin-left:auto"><span class="lead-status-dot dot-proposal"></span> Proposal Sent</span>
+            <span class="verified-badge">✓ 1 verified</span>
+          </div>
+        </div>
+
+        <div class="lead-card animate-in delay-6">
+          <div class="lead-card-header">
+            <span class="lead-company">Cracker Barrel Lebanon R…</span>
+            <span class="lead-score cool">62</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Messer Construction</span>
+          </div>
+          <div class="lead-meta">
+            <span>$980K</span> <span>·</span> <span>6,500 sqft</span>
+            <span style="margin-left:auto"><span class="lead-status-dot dot-new"></span> New</span>
+          </div>
+        </div>
+
+        <div class="lead-card animate-in delay-7">
+          <div class="lead-card-header">
+            <span class="lead-company">Wyndham Conference C…</span>
+            <span class="lead-score cool">55</span>
+          </div>
+          <div class="lead-detail-line">
+            <span>🏗</span> <span class="company-name">Structure Tone</span>
+          </div>
+          <div class="lead-meta">
+            <span>$2.1M</span> <span>·</span> <span>22,000 sqft</span>
+            <span style="margin-left:auto"><span class="lead-status-dot dot-new"></span> New</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="lead-count">47 leads · 12 hot</span>
+        <button class="add-lead-btn">+ New Lead</button>
+      </div>
+    </div>
+
+    <!-- CENTER: Lead Profile -->
+    <div class="center-panel">
+      <div class="profile-header animate-in delay-2">
+        <div class="profile-top-row">
+          <div class="profile-icon">🏢</div>
+          <div class="profile-info">
+            <div class="profile-company-name">
+              Marriott Bethesda Renovation
+              <span class="profile-score-badge">96</span>
+            </div>
+            <div class="profile-meta">
+              <span>🏗 Marriott International</span>
+              <span class="profile-meta-dot">·</span>
+              <span>Bethesda, MD</span>
+              <span class="profile-meta-dot">·</span>
+              <span>Turner Construction</span>
+            </div>
+            <div class="profile-status-row">
+              <span class="status-pill status-qualified">● Qualified</span>
+              <span class="est-value-label">Est. furniture value</span>
+              <span class="est-value">$450,000</span>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="action-btn primary">✦ AI Proposal</button>
+            <button class="action-btn">⋯</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project stats row -->
+      <div class="project-stats animate-in delay-3">
+        <div class="project-stat">
+          <div class="stat-icon money">$</div>
+          <div class="stat-data">
+            <div class="stat-value">$4.2M</div>
+            <div class="stat-label">Project Size</div>
+          </div>
+        </div>
+        <div class="project-stat">
+          <div class="stat-icon size">⊞</div>
+          <div class="stat-data">
+            <div class="stat-value">48,000</div>
+            <div class="stat-label">Square Feet</div>
+          </div>
+        </div>
+        <div class="project-stat">
+          <div class="stat-icon type">🔨</div>
+          <div class="stat-data">
+            <div class="stat-value" style="font-size:13px;font-family:'DM Sans',sans-serif">Commercial Interior</div>
+            <div class="stat-label">Permit Type</div>
+          </div>
+        </div>
+        <div class="project-stat">
+          <div class="stat-icon date">📅</div>
+          <div class="stat-data">
+            <div class="stat-value">Jan 15, 2026</div>
+            <div class="stat-label">Filed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-scroll">
+
+        <!-- Lead Score Breakdown -->
+        <div class="section-header animate-in delay-4">
+          <div class="section-title">Lead Score Breakdown</div>
+        </div>
+        <div class="score-bars animate-in delay-4">
+          <div class="score-bar-row">
+            <div class="score-bar-label">Project Size</div>
+            <div class="score-bar-track"><div class="score-bar-fill bar-gold" style="width:92%"></div></div>
+            <div class="score-bar-value">$4.2M</div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label">Contractor Reputation</div>
+            <div class="score-bar-track"><div class="score-bar-fill bar-ember" style="width:98%"></div></div>
+            <div class="score-bar-value">Tier 1 national</div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label">Contact Availability</div>
+            <div class="score-bar-track"><div class="score-bar-fill bar-success" style="width:85%"></div></div>
+            <div class="score-bar-value">3 verified</div>
+          </div>
+          <div class="score-bar-row">
+            <div class="score-bar-label">Industry Fit</div>
+            <div class="score-bar-track"><div class="score-bar-fill bar-info" style="width:95%"></div></div>
+            <div class="score-bar-value">Hotels & Hospitality</div>
+          </div>
+        </div>
+
+        <!-- Decision Makers -->
+        <div class="decision-makers animate-in delay-5">
+          <div class="section-header">
+            <div class="section-title">Decision Makers · 3</div>
+            <div class="section-badge">⚡ Auto-enriched</div>
+          </div>
+          <div class="contact-list">
+            <div class="contact-row">
+              <div class="contact-avatar avatar-1">SC</div>
+              <div class="contact-info">
+                <div class="contact-name-row">
+                  <span class="contact-name">Sarah Chen</span>
+                  <span class="contact-confidence">98%</span>
+                </div>
+                <div class="contact-title">VP of Procurement</div>
+              </div>
+              <div class="contact-actions">
+                <div class="contact-action-btn" title="Call">📞</div>
+                <div class="contact-action-btn" title="Email">✉</div>
+                <div class="contact-action-btn" title="LinkedIn">in</div>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-avatar avatar-2">JR</div>
+              <div class="contact-info">
+                <div class="contact-name-row">
+                  <span class="contact-name">James Rodriguez</span>
+                  <span class="contact-confidence">95%</span>
+                </div>
+                <div class="contact-title">Director, Interior Design</div>
+              </div>
+              <div class="contact-actions">
+                <div class="contact-action-btn">📞</div>
+                <div class="contact-action-btn">✉</div>
+                <div class="contact-action-btn">in</div>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-avatar avatar-3">MP</div>
+              <div class="contact-info">
+                <div class="contact-name-row">
+                  <span class="contact-name">Michelle Park</span>
+                  <span class="contact-confidence">87%</span>
+                </div>
+                <div class="contact-title">Procurement Manager</div>
+              </div>
+              <div class="contact-actions">
+                <div class="contact-action-btn">📞</div>
+                <div class="contact-action-btn">✉</div>
+                <div class="contact-action-btn">in</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enrichment Insights -->
+        <div class="enrichment-insights animate-in delay-6">
+          <div class="section-header">
+            <div class="section-title">Enrichment Insights</div>
+          </div>
+
+          <div class="insight-group">
+            <div class="insight-group-label">Business Challenges</div>
+            <div class="insight-tags">
+              <span class="insight-tag">Renovation timeline pressure</span>
+              <span class="insight-tag">Sustainability mandates</span>
+              <span class="insight-tag">Budget optimization</span>
+            </div>
+          </div>
+
+          <div class="insight-group">
+            <div class="insight-group-label">Technology Stack</div>
+            <div class="insight-tags">
+              <span class="insight-tag">Oracle</span>
+              <span class="insight-tag">Salesforce</span>
+              <span class="insight-tag">SAP</span>
+              <span class="insight-tag">Procore</span>
+              <span class="insight-tag">Workday</span>
+            </div>
+          </div>
+
+          <div class="insight-group">
+            <div class="insight-group-label">AI-Identified Signals</div>
+            <div class="insight-tags">
+              <span class="insight-tag">Multi-property renovation cycle</span>
+              <span class="insight-tag">New F&B concepts</span>
+              <span class="insight-tag">$500M capital plan</span>
+              <span class="insight-tag">Procurement expanding</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Permits -->
+        <div class="permits-section animate-in delay-7">
+          <div class="section-header">
+            <div class="section-title">Recent Permits</div>
+          </div>
+          <div class="permits-card">
+            <table class="permits-table">
+              <thead><tr><th>Property</th><th>Type</th><th>Value</th><th>Date</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Bethesda Marriott HQ</td>
+                  <td>Commercial Interior</td>
+                  <td class="permit-value">$4.2M</td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-size:11px">01/2026</td>
+                </tr>
+                <tr>
+                  <td>JW Marriott Orlando</td>
+                  <td>FF&E Replacement</td>
+                  <td class="permit-value">$890K</td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-size:11px">12/2025</td>
+                </tr>
+                <tr>
+                  <td>Marriott Marquis DC</td>
+                  <td>Restaurant Refresh</td>
+                  <td class="permit-value">$520K</td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-size:11px">11/2025</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: AI Copilot -->
+    <div class="copilot-panel">
+      <div class="copilot-header">
+        <div class="copilot-title">
+          <div class="copilot-dot"></div>
+          Copilot
+          <span style="font-size:9px;padding:1px 6px;border-radius:4px;background:var(--accent-ember-soft);color:var(--accent-ember);font-weight:600">AI</span>
+        </div>
+        <button class="titlebar-btn" style="font-size:10px">⊟</button>
+      </div>
+
+      <div class="copilot-tabs">
+        <button class="copilot-tab active">🖊 Proposal</button>
+        <button class="copilot-tab">✉ Email</button>
+        <button class="copilot-tab">↩ Reply</button>
+        <button class="copilot-tab">🔍 Research</button>
+      </div>
+
+      <div class="copilot-context">
+        <div class="context-label">Context</div>
+        <div class="context-tags">
+          <span class="context-tag">Marriott International</span>
+          <span class="context-tag">Commercial Interior Renovation</span>
+          <span class="context-tag">Sarah Chen, VP Procurement</span>
+          <span class="context-tag">$4.2M</span>
+        </div>
+      </div>
+
+      <div class="copilot-chat">
+        <div class="ai-message">
+          <div class="ai-draft-label">✦ Generated Draft</div>
+          <div class="ai-draft-title">Custom Furniture for Marriott Bethesda Renovation</div>
+
+          Dear Sarah Chen,<br><br>
+          We noticed your commercial interior renovation project in Bethesda, MD — a 48,000 sqft build by Turner Construction. Table Topics specializes in hospitality-grade custom furniture, and we'd love to support this project.<br><br>
+          With the $4.2M scope, we can offer competitive lead times on custom tables, surfaces, and millwork — all manufactured in-house for quality and speed.<br><br>
+          <strong>Proposed approach:</strong><br>
+          1. Site review + design consultation<br>
+          2. Custom samples and material selection<br>
+          3. Production and phased delivery<br><br>
+          <div class="ai-draft-value">Est. value: $450,000 · from permit + enrichment data</div>
+        </div>
+      </div>
+
+      <div class="copilot-input-area">
+        <div class="copilot-input">
+          <input placeholder="Refine or ask a follow-up…" />
+          <button class="send-btn">→</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <div class="bottom-shortcuts">
+      <div class="shortcut"><kbd>⌘K</kbd> Search</div>
+      <div class="shortcut"><kbd>⌘N</kbd> New Lead</div>
+      <div class="shortcut"><kbd>⌘E</kbd> Enrich</div>
+      <div class="shortcut"><kbd>⌘⇧P</kbd> Copilot</div>
+    </div>
+    <div class="bottom-integrations">
+      <span class="integration-dot"></span> Shovels.ai
+      <span>·</span> Explorium
+      <span>·</span> 8 permits
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
